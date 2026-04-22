@@ -39,21 +39,31 @@ public class FIFOPageReplacementLab {
         int pageFaults = 0;
         int pageHits = 0;
 
-        // TODO 1: Implement FIFO algorithm here
-        // Queue<Integer> queue = new LinkedList<>();
-        // Set<Integer> pagesInMemory = new HashSet<>();
+        // Use a Queue to maintain the FIFO order of pages
+        Queue<Integer> queue = new LinkedList<>();
+        // Use a Set for O(1) lookups to check if a page is in memory
+        Set<Integer> pagesInMemory = new HashSet<>();
 
-        // for (int page : referenceString) {
-        //     if (pagesInMemory.contains(page)) {
-        //         // Page HIT
-        //     } else {
-        //         // Page FAULT
-        //         if (queue.size() == numFrames) {
-        //             // Remove oldest page
-        //         }
-        //         // Add new page
-        //     }
-        // }
+        for (int page : referenceString) {
+            if (pagesInMemory.contains(page)) {
+                // Page HIT: The page is already in memory
+                pageHits++;
+            } else {
+                // Page FAULT: The page is not in memory
+                pageFaults++;
+                
+                // If the frames are full, we need to remove the oldest page
+                if (queue.size() == numFrames) {
+                    // Remove oldest page from the queue and the set
+                    int victim = queue.poll();
+                    pagesInMemory.remove(victim);
+                }
+                
+                // Add the new page to both the queue and the set
+                queue.add(page);
+                pagesInMemory.add(page);
+            }
+        }
 
         return new int[]{pageFaults, pageHits};
     }

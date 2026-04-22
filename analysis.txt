@@ -1,0 +1,34 @@
+Belady's Anomaly
+Belady’s Anomaly occurs because the First-In-First-Out algorithm strictly relies on the arrival time of pages rather than their actual usage frequency. When
+ you increase the number of available frames, the chronological rhythm of evictions shifts completely. This shift can inadvertently cause a frequently
+ needed page to be swapped out right before it is requested again. Because the algorithm operates blindly without recognizing temporal locality, having
+ a larger memory buffer can ironically trap the system in a cycle of evicting the wrong pages at the wrong time, leading to an unexpected increase in
+ overall page faults.
+
+Data Structures
+We use a Queue alongside a Set to drastically optimize the time complexity of the simulation. The Queue is perfect for maintaining the strict chronological
+ order of pages, allowing us to instantly identify and remove the oldest page when memory is full. However, a Queue is highly inefficient for searching. If
+ we relied solely on a Queue, the program would be forced to perform a slow linear search through every frame just to check if a requested page is already
+ in memory. By adding a HashSet, we achieve instantaneous, constant-time lookups to verify page hits immediately.
+
+Performance
+To calculate the effective access time, we use the standard formula which combines the memory access time and the page fault penalty based on the fault
+ probability. For Test Case 1 with three frames, the simulation yielded a fault rate of 75%, meaning the probability of a page fault is 0.75. We must first
+ convert the 8-millisecond fault time to 8,000,000 nanoseconds to match units. Plugging these values into the formula, we calculate
+ EAT=(1−0.75)×200+0.75×8000000. This results in a final effective access time of exactly 6,000,050 nanoseconds.
+
+Pattern Analysis
+Test Case 3, which features a sequential looping pattern, demonstrated the absolute worst performance by suffering a 100% page fault rate. This
+ catastrophic failure occurs because the access pattern continuously cycles through four distinct pages, but the system only has three physical memory
+ frames available. Consequently, every single time a new page is loaded into memory, it is forced to evict the exact page that will be required next in the
+ loop. The First-In-First-Out algorithm's inability to recognize this repeating sequential behavior guarantees that the requested page is always missing
+ from memory.
+
+Real World
+Modern operating systems avoid pure First-In-First-Out algorithms because they completely ignore the fundamental computing principle of temporal locality.
+ In real-world applications, programs tend to access the same set of variables and memory locations repeatedly over a short period. First-In-First-Out
+ blindly evicts the oldest page, meaning it will routinely discard highly active, critical data simply because it was loaded into memory a long time ago.
+ To achieve efficient performance, modern systems utilize smarter, frequency-aware algorithms like Least Recently Used, which actively monitor historical
+ access patterns to ensure that heavily utilized pages remain securely in memory.
+
+
